@@ -1,0 +1,22 @@
+diff --git a/acestep/audio_utils.py b/acestep/audio_utils.py
+index 0cdc607..1fb32e0 100644
+--- a/acestep/audio_utils.py
++++ b/acestep/audio_utils.py
+@@ -159,12 +159,13 @@ class AudioSaver:
+             temp_wav_path = Path(temp_wav.name)
+ 
+         try:
+-            torchaudio.save(
++            import soundfile as sf
++            audio_np = tensor_to_save.transpose(0, 1).numpy()
++            info = sf.write(
+                 str(temp_wav_path),
+-                tensor_to_save,
++                audio_np,
+                 int(target_sample_rate),
+-                channels_first=True,
+-                backend='soundfile',
++                format="WAV",
+             )
+             cmd = [
+                 'ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
