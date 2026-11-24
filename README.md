@@ -24,12 +24,15 @@ This container includes a dedicated patch (`01-audio_utils.patch`) that replaces
 
 ```text
 .
-├── 01-audio_utils.patch    # Patch replacing torchaudio.save with soundfile
+├── .github/
+│   └── workflows/
+│       └── docker-publish.yml # CI/CD workflow to build and push image to GHCR
+├── 01-audio_utils.patch       # Patch replacing torchaudio.save with soundfile
 ├── docker/
-│   └── Dockerfile          # Container build definition based on intel/pytorch:latest
+│   └── Dockerfile             # Container build definition based on intel/pytorch:latest
 ├── scripts/
-│   └── run.sh              # Helper script to launch the container with GPU device passthrough
-├── .env                    # Hardware, device, and network configuration
+│   └── run.sh                 # Helper script to launch the container with GPU device passthrough
+├── .env                       # Hardware, device, and network configuration
 └── README.md
 ```
 
@@ -83,12 +86,28 @@ Additional ACE-Step variables (such as `ACESTEP_CONFIG_PATH` or `ACESTEP_LM_MODE
 
 ---
 
-## Building the Docker Image
+## Container Registry & CI/CD (GHCR)
 
-Build the Docker image from the repository root:
+This repository includes a GitHub Actions workflow ([`.github/workflows/docker-publish.yml`](./.github/workflows/docker-publish.yml)) that automatically builds and publishes the container image to GitHub Container Registry (GHCR):
+
+- **Push to `master`**: Automatically builds and publishes the image tagged as `latest` and `master`.
+- **Release Tags (`v*.*.*`)**: Builds and tags the image with the corresponding semantic version tags.
+- **Pull Requests**: Runs a test build without pushing to registry.
+
+You can pull the prebuilt image directly from GHCR:
 
 ```bash
-docker build -f docker/Dockerfile -t asssaf/ace-step-intel-xpu:latest .
+docker pull ghcr.io/asssaf/ace-step-intel:latest
+```
+
+---
+
+## Building the Docker Image
+
+You can also build the Docker image locally from the repository root:
+
+```bash
+docker build -f docker/Dockerfile -t ace-step-intel-xpu:latest .
 ```
 
 The build process will:
@@ -112,10 +131,10 @@ chmod +x scripts/run.sh
 ./scripts/run.sh
 ```
 
-You can override the image tag by setting the `IMAGE` environment variable:
+By default, `scripts/run.sh` runs the GHCR image `ghcr.io/asssaf/ace-step-intel:latest`. You can override the image tag by setting the `IMAGE` environment variable:
 
 ```bash
-IMAGE="my-custom-tag:latest" ./scripts/run.sh
+IMAGE="ace-step-intel-xpu:latest" ./scripts/run.sh
 ```
 
 ### Option 2: Running with `docker run` Directly
@@ -130,7 +149,7 @@ docker run --rm -it --name ace-step \
     -p 7860:7860 \
     --net host \
     --ipc=host \
-    asssaf/ace-step-intel-xpu:latest
+    ghcr.io/asssaf/ace-step-intel:latest
 ```
 
 #### Key Flags Explained:
