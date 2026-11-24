@@ -1,4 +1,4 @@
-: ${IMAGE:=asssaf/ace-step-intel-xpu}
+: ${IMAGE:=ghcr.io/asssaf/ace-step-intel:latest}
 
 docker run --rm -it --name ace-step \
 	--device /dev/dri:/dev/dri \
